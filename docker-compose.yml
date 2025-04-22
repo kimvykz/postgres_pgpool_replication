@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  pg-master:
+    container_name: pg-master
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: kari
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/pg-master:/var/lib/postgresql/data
+      - ./config/master/postgresql.conf:/configs/postgresql.conf
+      - ./config/master/pg_hba.conf:/configs/pg_hba.conf
+      - ./config/master/init-master.sh:/docker-entrypoint-initdb.d/init-master.sh
+    networks:
+      - pg-network
+
+  pg-slave-1:
+    container_name: pg-slave-1
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: kari
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    depends_on:
+      - pg-master
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data/pg-slave-1:/var/lib/postgresql/data
+      - ./config/slave/postgresql.conf:/configs/postgresql.conf
+      - ./config/slave/replica-entrypoint.sh:/replica-entrypoint.sh
+    command: ["/bin/bash", "/replica-entrypoint.sh"]
+    networks:
+      - pg-network
+  
+  pg-slave-2:
+    container_name: pg-slave-2
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: kari
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    depends_on:
+      - pg-master
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./data/pg-slave-2:/var/lib/postgresql/data
+      - ./config/slave/postgresql.conf:/configs/postgresql.conf
+      - ./config/slave/replica-entrypoint.sh:/replica-entrypoint.sh
+    command: ["/bin/bash", "/replica-entrypoint.sh"]
+    networks:
+      - pg-network
+
+  pg-slave-3:
+    container_name: pg-slave-3
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: kari
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    depends_on:
+      - pg-master
+    ports:
+      - "5436:5432"
+    volumes:
+      - ./data/pg-slave-3:/var/lib/postgresql/data
+      - ./config/slave/postgresql.conf:/configs/postgresql.conf
+      - ./config/slave/replica-entrypoint.sh:/replica-entrypoint.sh
+    command: ["/bin/bash", "/replica-entrypoint.sh"]
+    networks:
+      - pg-network    
+
+  pgpool:
+    container_name: pgpool
+    image: bitnami/pgpool:4.6.0
+    restart: always
+    ports:
+      - "5435:5432"
+    environment:
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD=admin
+      - PGPOOL_BACKEND_NODES=0:pg-master:5432,1:pg-slave-1:5432,2:pg-slave-2:5432,3:pg-slave-3:5432
+      - PGPOOL_SR_CHECK_USER=root
+      - PGPOOL_SR_CHECK_PASSWORD=root
+      - PGPOOL_ENABLE_LOAD_BALANCING=yes
+      - PGPOOL_ENABLE_LOG_CONNECTIONS=yes
+      - PGPOOL_POSTGRES_USERNAME=root
+      - PGPOOL_POSTGRES_PASSWORD=root
+    volumes:
+      - ./config/pgpool/pgpool.conf:/opt/bitnami/pgpool/conf/pgpool.conf
+      - ./config/pgpool/pool_hba.conf:/opt/bitnami/pgpool/conf/pool_hba.conf
+      - ./config/pgpool/start.sh:/opt/bitnami/scripts/start.sh
+    networks:
+      - pg-network    
+
+networks:
+  pg-network:
+    driver: bridge
