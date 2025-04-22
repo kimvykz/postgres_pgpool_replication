@@ -6,9 +6,9 @@ services:
     image: postgres:17
     restart: always
     environment:
-      POSTGRES_DB: kari
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -24,9 +24,9 @@ services:
     image: postgres:17
     restart: always
     environment:
-      POSTGRES_DB: kari
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       - pg-master
     ports:
@@ -44,9 +44,9 @@ services:
     image: postgres:17
     restart: always
     environment:
-      POSTGRES_DB: kari
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       - pg-master
     ports:
@@ -64,9 +64,9 @@ services:
     image: postgres:17
     restart: always
     environment:
-      POSTGRES_DB: kari
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       - pg-master
     ports:
@@ -86,15 +86,15 @@ services:
     ports:
       - "5435:5432"
     environment:
-      - PGPOOL_ADMIN_USERNAME=admin
-      - PGPOOL_ADMIN_PASSWORD=admin
+      - PGPOOL_ADMIN_USERNAME=${PGPOOL_ADMIN_USERNAME}
+      - PGPOOL_ADMIN_PASSWORD=${PGPOOL_ADMIN_PASSWORD}
       - PGPOOL_BACKEND_NODES=0:pg-master:5432,1:pg-slave-1:5432,2:pg-slave-2:5432,3:pg-slave-3:5432
-      - PGPOOL_SR_CHECK_USER=root
-      - PGPOOL_SR_CHECK_PASSWORD=root
+      - PGPOOL_SR_CHECK_USER=${PGPOOL_SR_CHECK_USER}
+      - PGPOOL_SR_CHECK_PASSWORD=${PGPOOL_SR_CHECK_PASSWORD}
       - PGPOOL_ENABLE_LOAD_BALANCING=yes
       - PGPOOL_ENABLE_LOG_CONNECTIONS=yes
-      - PGPOOL_POSTGRES_USERNAME=root
-      - PGPOOL_POSTGRES_PASSWORD=root
+      - PGPOOL_POSTGRES_USERNAME=${PGPOOL_POSTGRES_USERNAME}
+      - PGPOOL_POSTGRES_PASSWORD=${PGPOOL_POSTGRES_PASSWORD}
     volumes:
       - ./config/pgpool/pgpool.conf:/opt/bitnami/pgpool/conf/pgpool.conf
       - ./config/pgpool/pool_hba.conf:/opt/bitnami/pgpool/conf/pool_hba.conf

@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-# Если кластер пустой — делаем бэкап с мастера
+# if cluster if empty — launch restoring a backup
 if [ ! -s "$PGDATA/PG_VERSION" ]; then
   echo "Starting base backup from master..."
 
-  PGPASSWORD=root pg_basebackup -h pg-master -U root -D "$PGDATA" -Fp -Xs -P -R
+  PGPASSWORD=${POSTGRES_PASSWORD} pg_basebackup -h pg-master -U ${POSTGRES_USER} -D "$PGDATA" -Fp -Xs -P -R
 
   echo "Base backup completed."
 fi
 
-# Старт PostgreSQL
+# Starting PostgreSQL
 exec docker-entrypoint.sh postgres

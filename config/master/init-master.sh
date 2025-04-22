@@ -7,5 +7,5 @@ cp /configs/pg_hba.conf /var/lib/postgresql/data/
 
 # creating user for replication
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-    CREATE ROLE root REPLICATION LOGIN ENCRYPTED PASSWORD 'root';
+    CREATE ROLE ${POSTGRES_USER} REPLICATION LOGIN ENCRYPTED PASSWORD '${POSTGRES_PASSWORD}';
 EOSQL
